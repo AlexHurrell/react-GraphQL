@@ -1,17 +1,12 @@
 import React from "react";
 import { render } from "react-dom";
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  useQuery,
-  gql,
-} from "@apollo/client";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { addMocksToSchema } from "@graphql-tools/mock";
 import casual from "casual-browserify";
 
 import { SchemaLink } from "@apollo/client/link/schema";
+import { App } from "./App";
 
 const typeDefs = `
 schema {
@@ -26,6 +21,7 @@ type Post {
   id: ID!
   author: String
   text: String
+  title: String
 }
 `;
 
@@ -38,44 +34,9 @@ const mocks = {
   Post: () => ({
     author: () => casual.first_name,
     text: () => casual.sentence,
+    title: () => casual.title,
   }),
 };
-
-function ExchangeRates() {
-  const { loading, error, data } = useQuery(gql`
-    query mq {
-      list {
-        id
-        author
-        text
-      }
-    }
-  `);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error :(</p>;
-
-  return (
-    <ol>
-      {data.list.map(({ author, text }) => (
-        <li key={author}>
-          <p>
-            {author}: {text}
-          </p>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-function App() {
-  return (
-    <div>
-      <h2>My first Apollo app 🚀</h2>
-      <ExchangeRates />
-    </div>
-  );
-}
 
 const schema = makeExecutableSchema({ typeDefs });
 
